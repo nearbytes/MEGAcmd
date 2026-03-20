@@ -32,7 +32,10 @@ namespace SyncCommand
     void printSync(mega::MegaApi& api, ColumnDisplayer& cd, bool showHandle, mega::MegaSync& sync,  const SyncIssueList& syncIssues);
     void printSyncList(mega::MegaApi& api, ColumnDisplayer& cd, bool showHandles, const mega::MegaSyncList& syncList, const SyncIssueList& syncIssues);
 
-    void addSync(mega::MegaApi& api, const fs::path& localPath, mega::MegaNode& node);
+    void addSync(mega::MegaApi& api,
+                 const fs::path& localPath,
+                 mega::MegaNode& node,
+                 mega::MegaSync::SyncType syncType);
 
     enum class ModifyOpts
     {

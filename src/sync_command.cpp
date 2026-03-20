@@ -271,10 +271,15 @@ void printSyncList(mega::MegaApi& api, ColumnDisplayer& cd, bool showHandles, co
     }
 }
 
-void addSync(mega::MegaApi& api, const fs::path& localPath, mega::MegaNode& node)
+void addSync(mega::MegaApi& api,
+             const fs::path& localPath,
+             mega::MegaNode& node,
+             mega::MegaSync::SyncType syncType)
 {
     std::unique_ptr<const char[]> nodePathPtr(api.getNodePath(&node));
     const char* nodePath = (nodePathPtr ? nodePathPtr.get() : "<path not found>");
+    const bool isDownSync = syncType == mega::MegaSync::TYPE_DOWN;
+    const char* syncModeName = isDownSync ? "read-only sync" : "sync";
 
     if (node.getType() == mega::MegaNode::TYPE_FILE)
     {
@@ -283,7 +288,7 @@ void addSync(mega::MegaApi& api, const fs::path& localPath, mega::MegaNode& node
         return;
     }
 
-    if (api.getAccess(&node) < mega::MegaShare::ACCESS_FULL)
+    if (!isDownSync && api.getAccess(&node) < mega::MegaShare::ACCESS_FULL)
     {
         setCurrentThreadOutCode(MCMD_NOTPERMITTED);
         LOG_err << "Syncing requires full access to path (current access: " << api.getAccess(&node) << ")";
@@ -291,7 +296,7 @@ void addSync(mega::MegaApi& api, const fs::path& localPath, mega::MegaNode& node
     }
 
     auto megaCmdListener = std::make_unique<MegaCmdListener>(nullptr);
-    api.syncFolder(mega::MegaSync::TYPE_TWOWAY, localPath.string().c_str(), nullptr, node.getHandle(), nullptr, megaCmdListener.get());
+    api.syncFolder(syncType, localPath.string().c_str(), nullptr, node.getHandle(), nullptr, megaCmdListener.get());
 
     megaCmdListener->wait();
 
@@ -299,13 +304,13 @@ void addSync(mega::MegaApi& api, const fs::path& localPath, mega::MegaNode& node
 
     if (errorOpt)
     {
-        LOG_err << "Failed to sync " << localPath.string() << " to " << nodePath
+        LOG_err << "Failed to add " << syncModeName << " " << localPath.string() << " to " << nodePath
                 << " (Error: " << *errorOpt << (syncErrorOpt ? ". Reason: " + *syncErrorOpt : "") << ")";
         return;
     }
 
     string syncLocalPath = megaCmdListener->getRequest()->getFile();
-    OUTSTREAM << "Added sync: " << syncLocalPath << " to " << nodePath << endl;
+    OUTSTREAM << "Added " << syncModeName << ": " << syncLocalPath << " to " << nodePath << endl;
 
     if (syncErrorOpt)
     {

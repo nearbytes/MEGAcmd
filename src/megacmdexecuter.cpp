@@ -7806,6 +7806,7 @@ void MegaCmdExecuter::executecommand(vector<string> words, map<string, int> *clf
         bool pauseSync = getFlag(clflags, "p") || getFlag(clflags, "pause") || getFlag(clflags, "s") || getFlag(clflags, "disable");
         bool enableSync = getFlag(clflags, "e") || getFlag(clflags, "r") || getFlag(clflags, "enable");
         bool deleteSync = getFlag(clflags, "delete") || getFlag(clflags, "d") || getFlag(clflags, "remove");
+        bool downSync = getFlag(clflags, "down") || getFlag(clflags, "read-only");
         bool showHandles = getFlag(clflags, "show-handles");
 
         if (!onlyZeroOrOneOf(pauseSync, enableSync, deleteSync))
@@ -7834,10 +7835,21 @@ void MegaCmdExecuter::executecommand(vector<string> words, map<string, int> *clf
                 return;
             }
 
-            SyncCommand::addSync(*api, localPath, *n);
+            SyncCommand::addSync(*api,
+                                 localPath,
+                                 *n,
+                                 downSync ? ::mega::MegaSync::TYPE_DOWN : ::mega::MegaSync::TYPE_TWOWAY);
         }
         else if (words.size() == 2) // manage a sync
         {
+            if (downSync)
+            {
+                setCurrentThreadOutCode(MCMD_EARGS);
+                LOG_err << "--down/--read-only can only be used when creating a sync";
+                LOG_err << "      " << getUsageStr("sync");
+                return;
+            }
+
             string pathOrId = words[1];
             auto sync = SyncCommand::getSync(*api, pathOrId);
             if (!sync)

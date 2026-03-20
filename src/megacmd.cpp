@@ -610,6 +610,8 @@ void insertValidParamsPerCommand(set<string> *validParams, string thecommand, se
         validParams->insert("enable");
         validParams->insert("d");
         validParams->insert("delete");
+        validParams->insert("down");
+        validParams->insert("read-only");
 
         validParams->insert("show-handles");
         validOptValues->insert("path-display-size");
@@ -2651,6 +2653,7 @@ string getHelpStr(const char *command, const HelpFlags& flags = {})
         os << " -d | --delete" << " " << "ID|localpath" << "\t" << "deletes a synchronization (not the files)." << endl;
         os << " -p | --pause" << " " << "ID|localpath" << "\t" << "pauses (disables) a synchronization." << endl;
         os << " -e | --enable" << " " << "ID|localpath" << "\t" << "resumes a synchronization." << endl;
+        os << " --down | --read-only" << "\t" << "when creating a sync, download remote changes without requiring full access." << endl;
         os << " [deprecated] --remove" << " " << "ID|localpath" << "\t" << "same as --delete." << endl;
         os << " [deprecated] -s | --disable" << " " << "ID|localpath" << "\t" << "same as --pause." << endl;
         os << " [deprecated] -r" << " " << "ID|localpath" << "\t" << "same as --enable." << endl;

@@ -1,4 +1,6 @@
 # MEGAcmd - Command Line Interactive and Scriptable Application
+Fork note: this repository is also used as the public Nearbytes MEGAcmd fork. For the small Nearbytes-specific delta from upstream, see [NEARBYTES_FORK.md](NEARBYTES_FORK.md).
+
 MEGAcmd provides non UI access to MEGA services. It intends to offer all the
 functionality with your MEGA account via commands. It features **synchronization**
 , **backup** of local folders into your MEGA account and a **webdav/streaming** server.
